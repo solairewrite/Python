@@ -10,12 +10,14 @@ import os
 import chardet  # 文件编码,项目设置中,进入pip,查找chardet,安装
 import re  # 正则表达式
 
-path = 'F:\\Work\\trunk\\Development\\Src\\TGAD19Game\\Classes'  # 文件目录
+path = 'F:\\Work\\trunk\\Development\\Src\\TGAD18Game\\Classes'  # 文件目录
+file_fullpath = 'F:\\Work\\trunk\\TGame\\Config\\DefaultAD18.ini'  # 单个修改文件的全路径
 new_encoding = 'utf-8'  # 新的编码格式
 filename_display_length = 40  # 文件名显示长度
 
 b_print_curr_encoding = True  # 是否显示当前编码
-b_change_encoding = True  # 是否修改文件编码
+b_change_all_file_encoding = False  # 是否修改文件夹下所有文件编码
+b_change_one_file_encoding = False  # 是否修改一个文件的编码
 
 
 def remove_line(in_fullname, instr):
@@ -69,7 +71,9 @@ def change_encoding(in_fullname, in_encoding):
         t_encode = chardet.detect(t_data).get('encoding')
 
         try:
-            t_decode_data = t_data.decode(t_encode)  # str
+            print('------------------%s---------------------------' % in_fullname)
+            # t_decode_data = t_data.decode(t_encode)
+            t_decode_data = t_data.decode('ansi')  # ansi 被错误解析为 gb2312
             t_encode_data = t_decode_data.encode(in_encoding)  # byte
             # utf-8编码内如果没有中文,转换失败
             if in_encoding == 'utf-8':
@@ -125,8 +129,8 @@ def print_all_file_encoding(inpath, indes=''):
 
 
 def main():
-    if b_change_encoding:
-        print_all_file_encoding(path, '初始')
+    if b_change_all_file_encoding:
+        # print_all_file_encoding(path, '初始')
         print()
         change_all_file_encoding(path, new_encoding)
         print()
@@ -134,6 +138,9 @@ def main():
 
     elif b_print_curr_encoding:
         print_all_file_encoding(path)
+
+    if b_change_one_file_encoding:
+        change_encoding(file_fullpath, new_encoding)
 
 
 main()
