@@ -122,7 +122,7 @@ def read_uc(in_fullpath):
                 if t_str_arr[i] == '':
                     del t_str_arr[i]
 
-            if len(t_str_arr) >= 4:  # var config int i; // 注释;
+            if len(t_str_arr) >= 4:  # var config int i; // 注释;;
                 t_config_para = t_str_arr[3].split(';')[0]
                 uc_config_dict[t_class].append(t_config_para)
 
