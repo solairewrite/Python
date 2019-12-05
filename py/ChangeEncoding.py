@@ -5,19 +5,22 @@
 #       空白的ANSI编码文件检测为None
 #       全英文,ascii编码的.uc文件,转换utf-8无效
 #       所以手动加了一行中文,而且中文不能删除,否则就不会被检测为utf-8
+# 解决: 发现并不是转换失败,而是检测错误,实际文件已经转为utf-8,并不需要加中文
+#       只要能以 utf-8 解码文件,就代表转换成功
 
 import os
 import chardet  # 文件编码,项目设置中,进入pip,查找chardet,安装
 import re  # 正则表达式
 
-path = 'F:\\Work\\trunk\\Development\\Src\\TGAD18Game\\Classes'  # 文件目录
-file_fullpath = 'F:\\Work\\trunk\\TGame\\Config\\DefaultAD18.ini'  # 单个修改文件的全路径
+path = 'F:\\Work\\trunk\\Development\\Src\\TGAD19Game\\Classes'  # 文件目录
+file_fullpath = 'F:\\Work\\trunk\\TGame\\Config\\DefaultAD19.ini'  # 单个修改文件的全路径
 new_encoding = 'utf-8'  # 新的编码格式
 filename_display_length = 40  # 文件名显示长度
 
-b_print_curr_encoding = True  # 是否显示当前编码
+b_only_check_can_decode = True  # 是否只显示,可否以指定格式解码
+b_print_curr_encoding = False  # 是否显示当前编码
 b_change_all_file_encoding = False  # 是否修改文件夹下所有文件编码
-b_change_one_file_encoding = False  # 是否修改一个文件的编码
+b_change_one_file_encoding = True  # 是否修改一个文件的编码
 
 
 def remove_line(in_fullname, instr):
@@ -71,13 +74,14 @@ def change_encoding(in_fullname, in_encoding):
         t_encode = chardet.detect(t_data).get('encoding')
 
         try:
-            print('------------------%s---------------------------' % in_fullname)
+            print('正在解码文件:', in_fullname)
             # t_decode_data = t_data.decode(t_encode)
             t_decode_data = t_data.decode('ansi')  # ansi 被错误解析为 gb2312
             t_encode_data = t_decode_data.encode(in_encoding)  # byte
-            # utf-8编码内如果没有中文,转换失败
-            if in_encoding == 'utf-8':
-                t_encode_data = '// 转为utf-8编码\n'.encode(in_encoding) + t_encode_data
+            # # utf-8编码内如果没有中文,转换失败
+            # if in_encoding == 'utf-8':
+            #     pass
+            #     t_encode_data = '// 转为utf-8编码\n'.encode(in_encoding) + t_encode_data
 
             # 经测试,需要新建文件才能生效,再删除原文件
             t_new_fullname = in_fullname + '_new'
@@ -118,6 +122,8 @@ def print_all_file_encoding(inpath, indes=''):
 
     print('目录: ', inpath)
     print('文件数量: ', len(t_filename_list))
+    print('检测结果可能不准确,仅供参考')
+    print('一个utf-8文件可能会显示为ascii,只要它能用utf-8解码即可')
 
     for t_filename in t_filename_list:
         t_fullname = os.path.join(inpath, t_filename)
@@ -128,13 +134,43 @@ def print_all_file_encoding(inpath, indes=''):
         print(chardet.detect(data).get('encoding'))
 
 
+def check_can_decode(in_fullname, in_encode):
+    try:
+        with open(in_fullname, 'r', encoding=in_encode) as t_file:
+            for line in t_file:
+                pass
+        return True
+    except IOError:
+        return False
+
+
+def check_all_file_can_edcode(inpath, in_encode):
+    t_filename_list = os.listdir(inpath)
+
+    print('目录: ', inpath)
+    print('文件数量: ', len(t_filename_list))
+    print('无法解码为 %s 的文件' % in_encode)
+
+    for t_filename in t_filename_list:
+        t_fullname = os.path.join(inpath, t_filename)
+        b_can_decode = check_can_decode(t_fullname, in_encode)
+        if not b_can_decode:
+            print(t_filename)
+
+
 def main():
+    if b_only_check_can_decode:
+        check_all_file_can_edcode(path, new_encoding)
+        # b_can_decode = check_can_decode(file_fullpath, new_encoding)
+        # print(file_fullpath, ' 可以解码为: ', new_encoding)
+        return
+
     if b_change_all_file_encoding:
         # print_all_file_encoding(path, '初始')
         print()
         change_all_file_encoding(path, new_encoding)
-        print()
-        print_all_file_encoding(path, '修改后')
+        print('修改结果: ')
+        check_all_file_can_edcode(path, new_encoding)
 
     elif b_print_curr_encoding:
         print_all_file_encoding(path)

@@ -8,7 +8,9 @@ import os
 from enum import Enum
 import ctypes  # 命令行彩色输出
 import sys
-import chardet
+
+
+# import chardet
 
 
 class RunType(Enum):  # 运行模式
@@ -17,10 +19,10 @@ class RunType(Enum):  # 运行模式
 
 
 run_type = RunType.cmd  # 运行文件前请先选择运行模式!!!
-uc_folder_path = 'F:\\Work\\trunk\\Development\\Src\\TGAD18Game\\Classes'
-ini_fullname = 'F:\\Work\\trunk\\TGame\\Config\\DefaultAD18.ini'
+uc_folder_path = 'F:\\Work\\trunk\\Development\\Src\\TGAD19Game\\Classes'
+ini_fullname = 'F:\\Work\\trunk\\TGame\\Config\\DefaultAD19.ini'
 # ini_fullname = 'F:\\Learn\\Python\\Test\\DefaultAD18.ini'
-project_name = 'TGAD18Game'
+project_name = 'TGAD19Game'
 
 b_print_right_info = False  # 是否打印正确信息
 b_print_config_class = True  # 打印字典时,是否打印类
@@ -40,9 +42,10 @@ def print_and_record(in_str='\n'):
 
 def read_ini():
     print_and_record('配置文件: ' + ini_fullname)
-    with open(ini_fullname, 'rb') as t_ini_binary:
-        t_encode = chardet.detect(t_ini_binary.read()).get('encoding')
-    t_ini = open(ini_fullname, 'r', encoding=t_encode)
+    # with open(ini_fullname, 'rb') as t_ini_binary:
+    #     t_encode = chardet.detect(t_ini_binary.read()).get('encoding')
+    # t_ini = open(ini_fullname, 'r', encoding=t_encode)
+    t_ini = open(ini_fullname, 'r', encoding='utf-8')
     t_class = ''
     for line in t_ini:
         if not len(line) or line.startswith(';'):
@@ -52,7 +55,9 @@ def read_ini():
                 and line.endswith(']\n')):
             t_class = line.split('.')[1].split(']')[0]
 
-        if t_class != '' and t_class not in ini_config_dict:
+        if t_class == '':
+            continue
+        if t_class not in ini_config_dict:
             ini_config_dict[t_class] = list()
 
         t_pair = line.split('=')
@@ -111,6 +116,12 @@ def read_uc(in_fullpath):
     for line in t_file:
         if line.startswith('var config '):
             t_str_arr = line.split(' ')
+            # 发现如果代码写的不规范,两个空格导致中间会有空字符
+            # 倒叙数组,0-100数组
+            for i in reversed(range(len(t_str_arr))):
+                if t_str_arr[i] == '':
+                    del t_str_arr[i]
+
             if len(t_str_arr) >= 4:  # var config int i; // 注释;
                 t_config_para = t_str_arr[3].split(';')[0]
                 uc_config_dict[t_class].append(t_config_para)
