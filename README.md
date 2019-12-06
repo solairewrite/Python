@@ -11,6 +11,6 @@
 cmd /k py -3 F:\Learn\Python\py\CheckConfig.py
 ```
 + 安装包,镜像  
-pip install -i https://pypi.tuna.tsinghua.edu.cn/simple chardet
+py -3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple chardet
 + 更新pip  
-python -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip
+py -3 -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip

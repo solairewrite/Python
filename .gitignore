@@ -1,4 +1,8 @@
 .idea/
 venv/
-Test/
+# 注释必须单独写一行
+Test/*
+# 忽略文件夹,但是不忽略文件夹下指定的文件
+!/Test/小怪.xlsx
 **/config_error_info.txt
+**/__pycache__/
