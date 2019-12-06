@@ -12,6 +12,9 @@ import os
 # os.path.split()       传入文件路径,输出目录和文件名
 #                       传入目录,输出上级目录和文件夹名
 
+# os.listdir()          目录下所有文件
+# os.path.exists()      文件/文件夹是否存在
+
 print()
 
 print(__file__)                     # F:/Learn/Python/py/tools/os_path.py
