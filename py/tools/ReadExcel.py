@@ -3,17 +3,16 @@
 # Description   : 读取Excel
 import xlrd
 from StringAlign import StringAlign
-from ColorPrint import ColorPrint, Color, RunType
+from ColorPrint import ColorPrint, Color
 
-path = 'F:\\Learn\\Python\\Test\\小怪.xlsx'
+# path = 'F:\\Learn\\Python\\Test\\小怪.xlsx'
+path = 'E:\\Learn\\Python\\py_tools\\Test\\小怪.xlsx'
 
 
 class ReadExecl:
     def __init__(self, filepath):
         self.excel = xlrd.open_workbook(filepath)
         self.sheet = self.excel.sheets()[0]
-        self.color_print = ColorPrint()
-        # self.color_print.change_run_type(RunType.cmd)
         self.print_sheet_name_list()
 
     def set_current_sheet(self, index=0):
@@ -45,7 +44,7 @@ class ReadExecl:
         for name in self.excel.sheet_names():
             des = des + name + '  '
         # cmd彩色输出不能在一行进行多次
-        self.color_print.color_print(des, Color.green)
+        ColorPrint.color_print(des, Color.green)
         # print()
 
     def print_row(self, row_index=0, display_length=20):
@@ -57,7 +56,7 @@ class ReadExecl:
             t_str = StringAlign.align(str(cell), display_length)
             des = des + t_str
         if row_index == 0:
-            self.color_print.color_print(des)
+            ColorPrint.color_print(des)
         else:
             print(des)
 
@@ -93,4 +92,4 @@ def __test():
     excel.print_sheet()
 
 
-__test()
+# __test()

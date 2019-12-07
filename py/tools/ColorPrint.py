@@ -1,9 +1,10 @@
 # Author        : Zhixin.Ji
 # Date          : 2019/12/6
-# Description   : 彩色打印,包括pycharm运行,或cmd运行
+# Description   : 彩色打印,通过命令行参数检测运行方式,pycharm 或 cmd
 from enum import Enum
 import ctypes
 import sys
+import argparse
 
 
 class RunType(Enum):
@@ -15,11 +16,9 @@ class RunType(Enum):
 class ColorValue:
     """颜色值结构"""
     # print()函数的颜色
-    # 黑30,红31,绿32,黄33,蓝34,洋红35,青36,白37
     print_value = 37
 
     # cmd颜色
-    # 黑0x00,红0x0c,绿0x0a,黄0x0e,蓝0x09,洋红0x0d,青0x0b,白0x0e
     cmd_value = 0x0e
 
     # 构造函数
@@ -42,14 +41,25 @@ class Color:
 class ColorPrint:
     """彩色输出,pycharm运行或cmd运行"""
     __run_type = RunType.pycharm
+    __b_finish_set_run_type = False
 
     @staticmethod
-    def change_run_type(new_type=RunType.pycharm):
-        ColorPrint.__run_type = new_type
+    def __get_run_type():
+        """根据命令行参数获取运行类型"""
+        if ColorPrint.__b_finish_set_run_type:
+            return ColorPrint.__run_type
 
-    @staticmethod
-    def default_run_type():
-        ColorPrint.change_run_type()
+        parser = argparse.ArgumentParser(description='命令行参数分析')
+        parser.add_argument('-c', '--bcmd',
+                            action='store_true',
+                            default=False,
+                            help='程序是否以命令行启动')
+        args = parser.parse_args()
+        if args.bcmd:
+            ColorPrint.__run_type = RunType.cmd
+        ColorPrint.__b_finish_set_run_type = True
+
+        return ColorPrint.__run_type
 
     # 函数名前加上'__'表示私有函数,默认函数为public
     @staticmethod
@@ -73,8 +83,8 @@ class ColorPrint:
 
     @staticmethod
     def color_print(in_str, in_color_value=Color.yellow, end='\n'):
-        """彩色输出,需要手动设置启动模式"""
-        if ColorPrint.__run_type == RunType.pycharm:
+        """彩色输出"""
+        if ColorPrint.__get_run_type() == RunType.pycharm:
             ColorPrint.__default_color_print(in_str, in_color_value.print_value, end)
-        elif ColorPrint.__run_type == RunType.cmd:
+        elif ColorPrint.__get_run_type() == RunType.cmd:
             ColorPrint.__cmd_color_print(in_str, in_color_value.cmd_value, end)

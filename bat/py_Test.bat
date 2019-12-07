@@ -1,2 +1,3 @@
 @echo off
-cmd /k py -3 F:\Learn\Python\py\Test.py --author 'jizhixin' -bcmd true
+cd ../py
+cmd /k py -3 Test.py -c

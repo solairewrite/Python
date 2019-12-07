@@ -1,2 +1,4 @@
 @echo off
-cmd /k py -3 F:\Learn\Python\py\tools\ReadExcel.py
+cd ../py/tools
+py -3 ReadExcel.py -c
+cmd /k
