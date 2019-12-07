@@ -19,7 +19,7 @@ print()
 
 print(__file__)                     # F:/Learn/Python/py/tools/os_path.py
 print(os.getcwd())                  # F:\Learn\Python\py\tools
-print(os.path.abspath('.'))         # F:\Learn\Python\py\tools
+print(os.path.abspath('..'))         # F:\Learn\Python\py\tools
 print(os.path.abspath('..'))        # F:\Learn\Python\py
 print('--------------------------------------')
 print(os.path.dirname(__file__))    # F:/Learn/Python/py/tools
