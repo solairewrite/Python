@@ -79,11 +79,8 @@ def add_new_comment(inpath):
         os.rename(t_new_fullname, t_old_fullname)
 
 
-def main():
+if __name__ == '__main__':
     if b_delete_old_comment:
         delete_old_comment(path)
     if b_add_new_comment:
         add_new_comment(path)
-
-
-main()

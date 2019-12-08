@@ -92,4 +92,5 @@ def __test():
     excel.print_sheet()
 
 
-# __test()
+if __name__ == '__main__':
+    __test()

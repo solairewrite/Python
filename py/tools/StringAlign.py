@@ -44,15 +44,12 @@ class StringAlign:
         return t_max_len
 
 
-def __test():
+if __name__ == '__main__':
     a = '一123三'
     b = '一二三四五abcdefgh'
     c = '一二三四abcde'
 
     t_list = [a, b, c]
-    t_len = StringAlign.get_list_width(t_list)
-    for t_str in t_list:
-        print('{}|'.format(StringAlign.align(t_str, t_len)))
-
-
-# __test()
+    _t_len = StringAlign.get_list_width(t_list)
+    for _t_str in t_list:
+        print('{}|'.format(StringAlign.align(_t_str, _t_len)))

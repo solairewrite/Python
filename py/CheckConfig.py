@@ -267,13 +267,10 @@ def write_error_txt(txt_name='config_error_info.txt'):
     print_red('数据写入' + t_fullname)
 
 
-def main():
+if __name__ == '__main__':
     read_ini()
     # print_config_dict(ini_config_dict, 'ini')
     read_folder(uc_folder_path)
     # print_config_dict(uc_config_dict, 'uc')
     compare_config()
     write_error_txt()
-
-
-main()

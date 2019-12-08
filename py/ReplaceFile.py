@@ -61,8 +61,7 @@ def replace_folder_file_content(inpath, in_old_str, in_new_str):
         replace_file_content(t_fullname, in_old_str, in_new_str)
 
 
-def main():
-    """程序入口"""
+if __name__ == '__main__':
     if b_replace_filename:
         print('文件名替换: ', old_filename_str, ' -> ', new_filename_str)
         replace_filename(path, old_filename_str, new_filename_str)
@@ -73,6 +72,3 @@ def main():
         print('文件内容替换: ', old_file_content_str, ' -> ', new_file_content_str)
         replace_folder_file_content(path, old_file_content_str, new_file_content_str)
         print('文件内容替换完成')
-
-
-main()

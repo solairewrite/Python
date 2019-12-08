@@ -137,8 +137,7 @@ def print_all_file_encoding(inpath, indes=''):
 def check_can_decode(in_fullname, in_encode):
     try:
         with open(in_fullname, 'r', encoding=in_encode) as t_file:
-            for line in t_file:
-                pass
+            t_file.close()
         return True
     except IOError:
         return False
@@ -158,12 +157,11 @@ def check_all_file_can_edcode(inpath, in_encode):
             print(t_filename)
 
 
-def main():
+if __name__ == '__main__':
     if b_only_check_can_decode:
         check_all_file_can_edcode(path, new_encoding)
         # b_can_decode = check_can_decode(file_fullpath, new_encoding)
         # print(file_fullpath, ' 可以解码为: ', new_encoding)
-        return
 
     if b_change_all_file_encoding:
         # print_all_file_encoding(path, '初始')
@@ -177,6 +175,3 @@ def main():
 
     if b_change_one_file_encoding:
         change_encoding(file_fullpath, new_encoding)
-
-
-main()
