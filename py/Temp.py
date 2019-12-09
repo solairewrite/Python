@@ -1,10 +1,8 @@
-import os
+# -*- coding:utf-8 -*-
+from colorama import init, Fore, Back
 
-if __name__ == "__main__":
-    a = os.path.abspath('.')
-    b = os.path.abspath('E:\\Learn\\Python\\py_tools\\bat\\py_Test.bat')
-    print(a)
-    print(b)
-    b_to_a = os.path.relpath(a, b)
-    print(b_to_a)
-    print(os.path.join(b, b_to_a))
+init(autoreset=True)
+
+print(Fore.RED + Back.WHITE + '你好')
+print(Fore.GREEN + '世界')
+print('滚蛋')

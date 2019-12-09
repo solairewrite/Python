@@ -5,6 +5,9 @@ from enum import Enum
 import ctypes
 import sys
 import argparse
+from colorama import init  # cmd输出彩色文字的模块
+
+init(autoreset=True)  # cmd也能彩色输出,autoreset:自动恢复到默认颜色
 
 
 class RunType(Enum):
@@ -84,7 +87,8 @@ class ColorPrint:
     @staticmethod
     def color_print(in_str, in_color_value=Color.yellow, end='\n'):
         """彩色输出"""
-        if ColorPrint.__get_run_type() == RunType.pycharm:
-            ColorPrint.__default_color_print(in_str, in_color_value.print_value, end)
-        elif ColorPrint.__get_run_type() == RunType.cmd:
-            ColorPrint.__cmd_color_print(in_str, in_color_value.cmd_value, end)
+        ColorPrint.__default_color_print(in_str, in_color_value.print_value, end)
+        # if ColorPrint.__get_run_type() == RunType.pycharm:
+        #     ColorPrint.__default_color_print(in_str, in_color_value.print_value, end)
+        # elif ColorPrint.__get_run_type() == RunType.cmd:
+        #     ColorPrint.__cmd_color_print(in_str, in_color_value.cmd_value, end)

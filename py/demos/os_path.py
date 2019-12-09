@@ -15,6 +15,7 @@ import os
 
 # os.listdir()          目录下所有文件
 # os.path.exists()      文件/文件夹是否存在
+# os.path.join()
 
 print()
 

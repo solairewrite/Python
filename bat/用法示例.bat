@@ -7,7 +7,7 @@ set title=运行.py文件
 :: 打印字符串
 echo hellow world
 :: 彩色输出,两个16进制数字分别表示背景色和前景色
-color 06
+color 0c
 :: 打印空行
 echo=
 :: 打印变量, echo %title%

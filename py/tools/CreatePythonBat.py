@@ -7,7 +7,7 @@ b_use_relative_path = True  # 是否使用相对路径
 b_folder = True  # 是否为文件夹下的所有py文件创建bat
 
 py_path = 'E:\\Learn\\Python\\py_tools\\py\\Test.py'
-py_folder = 'E:\\Learn\\Python\\py_tools\\py'
+py_folder = 'F:\\Learn\\Python\\py'
 
 relative_path = '../../bat'  # bat文件夹相对于自身CreatePythonBat.py的路径
 bat_path = 'E:\\Learn\\Python\\py_tools\\bat'  # 不使用相对路径时,bat目录
@@ -40,8 +40,8 @@ class CreatePythonBat:
                 t_file.write('cd {}\n'.format(bat_to_py))
             else:
                 t_file.write('cd {}\n'.format(t_py_folder))
-            t_file.write('py -3 {} -c\n'.format(os.path.split(in_py_path)[1]))
-            t_file.write('cmd /k\n')
+            # 单独一行 cmd /k 在某些电脑上,导致cmd彩色输出无效
+            t_file.write('cmd /k py -3 {}\n'.format(os.path.split(in_py_path)[1]))
 
         des = '成功' if os.path.exists(t_bat_path) else '失败'
         print('{} 创建{}'.format(t_bat_path, des))
