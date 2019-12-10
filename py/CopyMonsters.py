@@ -7,7 +7,9 @@ import os
 sys.path.append(os.path.abspath('tools'))
 from ReadExcel import ReadExecl
 from StringAlign import StringAlign
-from ColorPrint import ColorPrint
+from ColorPrint import ColorPrint, Color
+from ReplaceUCComment import ReplaceUCComment
+from ReadConfig import ReadConfig
 
 
 class Monster:
@@ -93,6 +95,7 @@ class Monster:
 
 
 path = 'F:\\Learn\\Python\\Test\\小怪.xlsx'
+ini_path_format_str = 'F:\\Work\\trunk\\TGame\\Config\\Default{}.ini'
 
 
 class CopyMonsters:
@@ -134,7 +137,79 @@ class CopyMonsters:
             mon.print_info()
 
     @staticmethod
+    def refresh_ini(old_ini_short_name, new_ini_short_name,
+                    old_class_name, new_class_name,
+                    new_proj_name):
+        """更新ini文件,短命类似 'AD19' """
+        # 检测是否已经有配置
+        new_ini_path = ini_path_format_str.format(new_ini_short_name)
+        new_config_dict = ReadConfig(new_ini_path)
+        new_proj_class, para_dict = new_config_dict.get_class(new_class_name)
+        if new_proj_class is not None:
+            return
+
+        # 获取旧的配置
+        old_ini_path = ini_path_format_str.format(old_ini_short_name)
+        old_config_dict = ReadConfig(old_ini_path)
+        old_proj_class, para_dict = old_config_dict.get_class(old_class_name)
+        # uc声明了配置文件,但是配置文件并没配置那个类
+        if old_proj_class is None:
+            return
+
+        # 写入新配置
+        temp_path = new_ini_path + '_new'
+        file = open(new_ini_path, 'r', encoding='utf-8')
+        temp_file = open(temp_path, 'w+', encoding='utf-8')
+
+        for line in file:
+            temp_file.write(line)
+
+        temp_file.write('\n\n; add by python tool by Zhixin.Ji\n')
+        # todo: 替换为计算出的项目名
+        t_proj_class = '[{}.{}]'.format(new_proj_name, new_class_name)
+        temp_file.write(t_proj_class + '\n')
+        for t_para in para_dict.keys():
+            t_value = para_dict[t_para]
+            t_str = '{} = {}'.format(t_para, t_value)
+            temp_file.write(t_str + '\n')
+
+        file.close()
+        temp_file.close()
+        os.remove(new_ini_path)
+        os.rename(temp_path, new_ini_path)
+
+    @staticmethod
+    def replace_config(in_srt, new_config_content,
+                       old_class_name, new_class_name,
+                       new_proj_name):
+        config_head = 'Config('
+        config_tail = ')'
+        t_head = ''
+        if config_head in in_srt and config_tail in in_srt:
+            t_head = config_head
+        elif config_head.lower() in in_srt and config_tail in in_srt:
+            t_head = config_head.lower()
+        if t_head != '':
+            char_before_config = in_srt[in_srt.index(t_head) - 1]
+            # 屏蔽不规范的代码,可能是两个空格
+            char_before_config = char_before_config \
+                .replace(' ', '').replace('\t', '').replace('\n', '')
+            if char_before_config == '':
+                config_content = in_srt.split(t_head)[1].split(config_tail)[0]
+                t_srt = in_srt.replace(config_content, new_config_content)
+
+                CopyMonsters.refresh_ini(
+                    config_content.replace(' ', ''), new_config_content,
+                    old_class_name, new_class_name,
+                    new_proj_name
+                )
+
+                return t_srt, True  # 修改了配置
+        return in_srt, False
+
+    @staticmethod
     def get_new_line(old_line: str, mon: Monster, new_file_path):
+        """传入旧的.uc文件的一行代码,获取新的.uc文件的一行代码"""
         new_line = old_line
         if 'class' in old_line and 'extends' in old_line:
             old_class = old_line.split('class')[1].split('extends')[0]
@@ -143,87 +218,149 @@ class CopyMonsters:
         if mon.old_str in old_line:
             new_line = new_line.replace(mon.old_str, mon.new_str)  # AD16->AD19
             new_line = new_line.replace(mon.old_name, mon.new_name)  # 继承的类
+
         return new_line
 
     @staticmethod
+    def get_vcproj_str_list(filter_tab_count, mon_name, mon_file_path_list):
+        str_list = list()
+        file_tab_count = filter_tab_count + 1
+        path_tab_count = file_tab_count + 1
+        str_list.append('\t' * filter_tab_count + '<Filter\n')
+        str_list.append('\t' * file_tab_count + 'Name=\"{}\"\n'.format(mon_name))
+        str_list.append('\t' * file_tab_count + '>\n')
+
+        for t_path in mon_file_path_list:
+            str_list.append('\t' * file_tab_count + '<File\n')
+
+            t_line = os.path.split(t_path)[1]
+            t_line = 'RelativePath=\".\\Classes\\{}\"\n'.format(t_line)
+            str_list.append('\t' * path_tab_count + t_line)
+
+            str_list.append('\t' * path_tab_count + '>\n')
+            str_list.append('\t' * file_tab_count + '</File>\n')
+
+        str_list.append('\t' * filter_tab_count + '</Filter>\n')
+        return str_list
+
+    @staticmethod
+    def is_mon_in_vcproj(vcproj_path, mon_name):
+        """检测小怪是否已经在vcproj"""
+        with open(vcproj_path, 'r', encoding='utf-8') as vcproj_file:
+            for line in vcproj_file:
+                if 'Name=\"{}\"'.format(mon_name) in line:
+                    return True
+        return False
+
+    @staticmethod
     def refresh_vcproj(vcproj_path, mon_name, mon_file_path_list):
+        if CopyMonsters.is_mon_in_vcproj(vcproj_path, mon_name):
+            return
+
         new_path = vcproj_path + '_new'
+        #  for line in old_file 只能迭代一次
         old_file = open(vcproj_path, 'r', encoding='utf-8')
         new_file = open(new_path, 'w+', encoding='utf-8')
 
-        b_find_mon = False
-        b_in_mon = False
-        tab_count = 0
-        mon_vc_list = list()
+        b_in_monster_filter = False
         for line in old_file:
+            new_file.write(line)
+
             if 'Name=\"Monster\"' in line:
-                b_find_mon = True
-                mon_vc_list.append(line)  # del
-            if b_find_mon and '>' in line:
-                b_in_mon = True
-                mon_vc_list.append(line)  # del
-                # temp = [line]
-                # print(temp)
+                b_in_monster_filter = True
+
+            if b_in_monster_filter and '>' in line:
                 filter_tab_count = line.count('\t')
-                file_tab_count = filter_tab_count + 1
-                path_tab_count = file_tab_count + 1
-                # print(tab_count)
-                mon_vc_list.append('\t' * filter_tab_count + '<Filter\n')
-                mon_vc_list.append('\t' * file_tab_count + 'Name=\"{}\"\n'.format(mon_name))
-                mon_vc_list.append('\t' * file_tab_count + '>\n')
 
-                for t_path in mon_file_path_list:
-                    mon_vc_list.append('\t' * file_tab_count + '<File\n')
+                mon_vc_list = CopyMonsters.get_vcproj_str_list(
+                    filter_tab_count, mon_name, mon_file_path_list)
 
-                    t_line = os.path.split(t_path)[1]
-                    t_line = 'RelativePath=\".\\Classes\\{}\"\n'.format(t_line)
-                    mon_vc_list.append('\t' * path_tab_count + t_line)
+                for t_str in mon_vc_list:
+                    new_file.write(t_str)
 
-                    mon_vc_list.append('\t' * path_tab_count + '>\n')
-                    mon_vc_list.append('\t' * file_tab_count + '</File>\n')
-
-                mon_vc_list.append('\t' * filter_tab_count + '</Filter>\n')
-
-                break
-
-        for line in mon_vc_list:
-            print(line, end='')
+                b_in_monster_filter = False
 
         old_file.close()
         new_file.close()
 
+        os.remove(vcproj_path)
+        os.rename(new_path, vcproj_path)
+
+    @staticmethod
+    def replace_mon_comment(mon_file_path_list):
+        for mon_path in mon_file_path_list:
+            ReplaceUCComment.delete_comment(mon_path)
+            author = 'python tool by Zhixin.Ji'
+            description = ''
+            ReplaceUCComment.add_comment(mon_path, author, description)
+
+    @staticmethod
+    def is_ignore_line(old_file_path, old_line):
+        """此行代码是否无需替换"""
+        if old_file_path.endswith('_Content.uc'):
+            ignore_str_list = ['AnimSets.Add',
+                               'AnimTree\'',
+                               'SkeletalMesh\'',
+                               'PhysicsAsset\'']
+            for ignore_str in ignore_str_list:
+                if ignore_str in old_line:
+                    return True
+        return False
+
     @staticmethod
     def copy_a_mon(mon: Monster):
         t_mons_dict = mon.get_all_monster_code_dict()
-        mon.get_all_monster_code_dict()
+        ColorPrint.color_print('复制: {}, 文件数量: {}'.format(mon.ch_name, len(t_mons_dict)))
         for old_file_path in t_mons_dict.keys():
             new_file_path = t_mons_dict[old_file_path]
 
-            # old_file = open(old_file_path, 'r', encoding='ansi')
-            # new_file = open(new_file_path, 'w+', encoding='utf-8')
-            #
-            # for old_line in old_file:
-            #     new_line = CopyMonsters.get_new_line(old_line, mon, new_file_path)
-            #     new_file.write(new_line)
-            #
-            # old_file.close()
-            # new_file.close()
+            old_class_name = os.path.split(old_file_path)[1].replace('.uc', '')
+            new_class_name = os.path.split(new_file_path)[1].replace('.uc', '')
+
+            old_file = open(old_file_path, 'r', encoding='ansi')
+            new_file = open(new_file_path, 'w+', encoding='utf-8')
+
+            b_need_replace_config = True
+            max_config_line = 30
+            line_index = 0
+            for old_line in old_file:
+                # 如果是动画资源,不替换
+                if CopyMonsters.is_ignore_line(old_file_path, old_line):
+                    new_file.write(old_line)
+                else:
+                    new_line = CopyMonsters.get_new_line(old_line, mon, new_file_path)
+                    # 替换配置
+                    line_index += 1
+                    if line_index >= max_config_line:
+                        b_need_replace_config = False
+                    if b_need_replace_config:
+                        new_line, b_config_replaced = \
+                            CopyMonsters.replace_config(
+                                new_line, mon.new_str,
+                                old_class_name, new_class_name, mon.new_proj)
+                        if b_config_replaced:
+                            b_need_replace_config = False
+                    new_file.write(new_line)
+
+            old_file.close()
+            new_file.close()
 
             # print(old_file_path)
             # ColorPrint.color_print(new_file_path)
-
-        print()
         CopyMonsters.refresh_vcproj(
             mon.get_new_vcproj(), mon.new_name, t_mons_dict.values()
         )
 
+        CopyMonsters.replace_mon_comment(t_mons_dict.values())
+        ColorPrint.color_print(mon.ch_name + ' 复制成功', Color.green)
+
     def copy_monsters_to_new_proj(self):
         for mon in self.copy_monsters:
-            if mon.new_name == 'Rocket':
+            if mon.new_name == 'Maid':
                 CopyMonsters.copy_a_mon(mon)
 
 
 if __name__ == '__main__':
     copy_monsters = CopyMonsters(path)
-    # copy_monsters.print_monsters()
+    copy_monsters.print_monsters()
     copy_monsters.copy_monsters_to_new_proj()

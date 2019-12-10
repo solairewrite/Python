@@ -1,8 +1,14 @@
 # -*- coding:utf-8 -*-
 from colorama import init, Fore, Back
+from ReadConfig import ReadConfig
 
-init(autoreset=True)
+path = 'F:\\Work\\trunk\\TGame\\Config\\DefaultADGame_3.ini'
 
-print(Fore.RED + Back.WHITE + '你好')
-print(Fore.GREEN + '世界')
-print('滚蛋')
+if __name__ == '__main__':
+    read_config = ReadConfig(path)
+    # read_config.print_config(b_print_para=True)
+    t_proj_class, t_para_dict = read_config.get_class('TGAD14RocketWeap_ATSL哇')
+    if t_para_dict is None:
+        print('类不存在')
+    else:
+        ReadConfig.print_class_info(t_proj_class, t_para_dict)
