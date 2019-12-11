@@ -127,6 +127,8 @@ class CopyMonsters:
 
     def get_monster(self, index, in_new_proj=''):
         row = self.excel.get_row(index + 1)
+        if row is None:
+            return None
         mon = Monster()
         # excel允许新项目名只在第一行设置
         t_new_proj = row[3]
@@ -139,6 +141,8 @@ class CopyMonsters:
         self.excel.set_current_sheet_by_name(sheet_name)
         mon_list = list()
         mon_count = self.excel.get_row_count() - 1
+        if mon_count <= 0:
+            return list()
         new_proj = self.get_monster(0).new_proj
         for i in range(mon_count):
             mon = self.get_monster(i, new_proj)
@@ -389,6 +393,6 @@ if __name__ == '__main__':
     copy_monsters = CopyMonsters(path)
     copy_monsters.print_monsters()
 
-    t_b_only_copy_one = False
-    t_mon_new_name = 'Whore'
+    t_b_only_copy_one = False  # 是否仅复制一个小怪
+    t_mon_new_name = 'WolfMan'  # 如果仅复制一个小怪,小怪的新名字
     copy_monsters.copy_monsters_to_new_proj(t_b_only_copy_one, t_mon_new_name)
