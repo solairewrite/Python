@@ -1,8 +1,8 @@
 # Author        : Zhixin.Ji
 # Date          : 2019-12-07
 # Description   : 复制小怪
-import sys
 import os
+import sys
 
 sys.path.append(os.path.abspath('tools'))
 from ReadExcel import ReadExecl
@@ -354,13 +354,24 @@ class CopyMonsters:
         CopyMonsters.replace_mon_comment(t_mons_dict.values())
         ColorPrint.color_print(mon.ch_name + ' 复制成功', Color.green)
 
-    def copy_monsters_to_new_proj(self):
-        for mon in self.copy_monsters:
-            if mon.new_name == 'Maid':
+    @staticmethod
+    def copy_mon_list(mon_list, b_only_copy_one=False, mon_new_name=''):
+        for mon in mon_list:
+            if b_only_copy_one:
+                if mon.new_name == mon_new_name:
+                    CopyMonsters.copy_a_mon(mon)
+            else:
                 CopyMonsters.copy_a_mon(mon)
+
+    def copy_monsters_to_new_proj(self, b_only_copy_one=False, mon_new_name=''):
+        CopyMonsters.copy_mon_list(self.copy_monsters, b_only_copy_one, mon_new_name)
+        CopyMonsters.copy_mon_list(self.change_monsters, b_only_copy_one, mon_new_name)
 
 
 if __name__ == '__main__':
     copy_monsters = CopyMonsters(path)
     copy_monsters.print_monsters()
-    copy_monsters.copy_monsters_to_new_proj()
+
+    t_b_only_copy_one = False
+    t_mon_new_name = 'Whore'
+    copy_monsters.copy_monsters_to_new_proj(t_b_only_copy_one, t_mon_new_name)

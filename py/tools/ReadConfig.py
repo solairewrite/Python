@@ -2,6 +2,7 @@
 # Date          : 2019-12-10
 # Description   : 读取ini配置文件
 from ColorPrint import ColorPrint
+import chardet
 
 
 class ReadConfig:
@@ -11,12 +12,23 @@ class ReadConfig:
         self.config_dict = ReadConfig.__init_config_dict(path)
 
     @staticmethod
+    def __get_encode(path):
+        with open(path, 'rb+') as file:
+            data = file.read()
+            encode = chardet.detect(data).get('encoding')
+        if encode is None or encode == '':
+            encode = 'utf-8'
+        return encode
+
+    @staticmethod
     def __init_config_dict(path):
         t_dict = dict()
         t_proj = ''
         t_class = ''
 
-        file = open(path, 'r', encoding='utf-8')
+        encode = ReadConfig.__get_encode(path)
+
+        file = open(path, 'r', encoding=encode)
         for line in file:
             if not len(line) or line.startswith(';'):
                 continue
