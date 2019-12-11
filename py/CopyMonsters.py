@@ -1,6 +1,25 @@
 # Author        : Zhixin.Ji
 # Date          : 2019-12-07
 # Description   : 复制小怪
+"""
+运行前配置:
+1, 按照指定格式,创建excel
+2, 设置 code_folder
+
+py完成的功能:
+1, 读取Excel,获取需要复制或换皮的小怪
+2, 读取旧.vcproj,找出小怪的类
+3, 将小怪的类复制进入新项目,并更新新项目的.vcproj
+4, 对于每个小怪的类,更新类顶部注释
+5, _conent.uc,保留旧的SkeletalMesh等资源
+6, 对于每个小怪的类,检查是否有配置
+7, 将旧配置改为'config(AD19)'
+8, 同时将旧的.ini文件关于该类的配置,复制到新项目的.ini文件中
+
+需要手动完成:
+1, TGAD19Types.uc文件添加自己小怪的枚举
+2, 引用了旧的.vcproj中不存在的类,手动添加该类
+"""
 import os
 import sys
 
@@ -10,6 +29,10 @@ from StringAlign import StringAlign
 from ColorPrint import ColorPrint, Color
 from ReplaceUCComment import ReplaceUCComment
 from ReadConfig import ReadConfig
+
+path = 'F:\\Learn\\Python\\Test\\小怪.xlsx'  # excel 路径
+code_folder = 'F:\\Work\\trunk\\Development\\Src\\{}\\Classes'  # 代码路径的格式化字符串,{}是占位符
+ini_path_format_str = 'F:\\Work\\trunk\\TGame\\Config\\Default{}.ini'  # 配置路径的格式化字符串
 
 
 class Monster:
@@ -21,8 +44,6 @@ class Monster:
 
     old_str = ''  # 要被替换的字符串
     new_str = ''  # 用于替换的新字符串
-
-    code_folder = 'F:\\Work\\trunk\\Development\\Src\\{}\\Classes'
 
     def init(self, ch_name, old_proj, old_name, new_proj, new_name):
         self.ch_name = ch_name
@@ -43,10 +64,10 @@ class Monster:
                       self.old_name))
 
     def get_old_proj_code_folder(self):
-        return self.code_folder.format(self.old_proj)
+        return code_folder.format(self.old_proj)
 
     def get_new_proj_code_folder(self):
-        return self.code_folder.format(self.new_proj)
+        return code_folder.format(self.new_proj)
 
     def get_old_vcproj(self):
         return self.get_old_proj_code_folder().replace('Classes', '') \
@@ -92,10 +113,6 @@ class Monster:
                     if '</Filter>' in line:
                         break
         return t_dict
-
-
-path = 'F:\\Learn\\Python\\Test\\小怪.xlsx'
-ini_path_format_str = 'F:\\Work\\trunk\\TGame\\Config\\Default{}.ini'
 
 
 class CopyMonsters:
