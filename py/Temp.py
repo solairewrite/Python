@@ -1,14 +1,14 @@
-# -*- coding:utf-8 -*-
-from colorama import init, Fore, Back
-from ReadConfig import ReadConfig
+from string import digits
 
-path = 'F:\\Work\\trunk\\TGame\\Config\\DefaultADGame_3.ini'
+
+def is_sililar_string(s1: str, s2: str):
+    remove_number = str.maketrans('', '', digits)
+    t1 = s1.translate(remove_number)
+    t2 = s2.translate(remove_number)
+    return t1 == t2
+
 
 if __name__ == '__main__':
-    read_config = ReadConfig(path)
-    # read_config.print_config(b_print_para=True)
-    t_proj_class, t_para_dict = read_config.get_class('TGAD14RocketWeap_ATSL哇')
-    if t_para_dict is None:
-        print('类不存在')
-    else:
-        ReadConfig.print_class_info(t_proj_class, t_para_dict)
+    ss1 = 'abc123edf456'
+    ss2 = 'aec163edf476'
+    print(is_sililar_string(ss1, ss2))
