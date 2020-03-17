@@ -7,8 +7,8 @@
 # 添加: or XXX in line,即可过滤掉含有XXX的行
 from string import digits
 
-log_path = 'C:\\Users\\jizhixin\\Desktop\\warning_error_log2.txt'  # 初始log路径
-output_path = 'C:\\Users\\jizhixin\\Desktop\\formated_log2.txt'  # 提取警告后的log路径
+log_path = 'C:\\Users\\jizhixin\\Desktop\\warning_error_log.txt'  # 初始log路径
+output_path = 'C:\\Users\\jizhixin\\Desktop\\formated_log.txt'  # 提取警告后的log路径
 
 all_line_list = list()
 no_duplicate_line_list = list()
@@ -84,7 +84,7 @@ def set_log_list():
             global warning_line_list
             warning_line_list.append(line)
 
-        if '[mokai]' in line:
+        if '[mokai]' in line or 'jzx' in line:
             global my_log_list
             my_log_list.append(line)
 

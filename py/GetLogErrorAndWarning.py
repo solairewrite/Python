@@ -5,8 +5,8 @@
 import chardet
 
 # log_path = 'F:\\Work\\trunk\\TGame\\Logs\\Launch_2.log'
-log_path = 'C:\\Users\\jizhixin\\Desktop\\e.txt'  # 初始log路径
-output_path = 'C:\\Users\\jizhixin\\Desktop\\warning_error_log2.txt'  # 提取警告后的log路径
+log_path = 'C:\\Users\\jizhixin\\Desktop\\Launch_2.log'  # 初始log路径
+output_path = 'C:\\Users\\jizhixin\\Desktop\\warning_error_log.txt'  # 提取警告后的log路径
 
 all_line_list = list()
 log_info_line = ''
@@ -18,13 +18,13 @@ my_log_list = list()
 def set_all_line_list(in_log_path):
     """获取log所有的行"""
     # 获取log编码
-    # with open(in_log_path, 'rb+') as t_file:
-    #     t_data = t_file.read()
-    #     t_encode = chardet.detect(t_data).get('encoding')
-    # if t_encode is None or t_encode == '':
-    #     t_encode = 'utf-8'
+    with open(in_log_path, 'rb+') as t_file:
+        t_data = t_file.read()
+        t_encode = chardet.detect(t_data).get('encoding')
+    if t_encode is None or t_encode == '':
+        t_encode = 'utf-8'
     # 强制使用编码
-    t_encode = 'ansi'
+    # t_encode = 'ansi'
 
     with open(in_log_path, 'r', encoding=t_encode) as t_file:
         # 将所有行存入内存中
@@ -65,7 +65,7 @@ def set_log_list():
             global warning_line_list
             warning_line_list.append(line)
 
-        if '[mokai]' in line:
+        if '[mokai]' in line or 'jzx' in line:
             global my_log_list
             my_log_list.append(line)
 

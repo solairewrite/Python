@@ -393,6 +393,6 @@ if __name__ == '__main__':
     copy_monsters = CopyMonsters(path)
     copy_monsters.print_monsters()
 
-    t_b_only_copy_one = False  # 是否仅复制一个小怪
-    t_mon_new_name = 'WolfMan'  # 如果仅复制一个小怪,小怪的新名字
+    t_b_only_copy_one = True  # 是否仅复制一个小怪
+    t_mon_new_name = 'Believer'  # 如果仅复制一个小怪,小怪的新名字
     copy_monsters.copy_monsters_to_new_proj(t_b_only_copy_one, t_mon_new_name)
